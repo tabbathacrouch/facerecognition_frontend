@@ -1,0 +1,8 @@
+{
+  "short_name": "Face Detection",
+  "name": "Face Recognition App with Sign in/out feature",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
