@@ -29,7 +29,12 @@ const particleOptions = {
 
 const initialState = {
   imageUrl: "",
-  boxes: [],
+  box: {
+    top_row: 0,
+    left_col: 0,
+    bottom_row: 0,
+    right_col: 0,
+  },
   route: "signin",
   isSignedIn: false,
   user: {
@@ -91,23 +96,23 @@ class App extends Component {
       .catch((err) => console.log(err));
   };
 
-  calculateFaceLocations = (response) => {
-    return response.outputs[0].data.regions.map((face) => {
-      0;
-      const clarifaiFace = face.region_info.bounding_box;
-      const image = document.getElementById("inputimage");
-      const width = Number(image.width);
-      const height = Number(image.height);
-      const topRow = clarifaiFace.top_row * height;
-      const leftCol = clarifaiFace.left_col * width;
-      const rightCol = width - clarifaiFace.right_col * width;
-      const bottomRow = height - clarifaiFace.bottom_row * height;
-      return {
+  calculateFaceLocation = (response) => {
+    const clarifaiFace =
+      response.outputs[0].data.regions[0].region_info.bounding_box;
+    const image = document.getElementById("inputimage");
+    const width = Number(image.width);
+    const height = Number(image.height);
+    const topRow = clarifaiFace.top_row * height;
+    const leftCol = clarifaiFace.left_col * width;
+    const rightCol = width - clarifaiFace.right_col * width;
+    const bottomRow = height - clarifaiFace.bottom_row * height;
+    this.setState({
+      box: {
         left: leftCol,
         top: topRow,
         right: rightCol,
         bottom: bottomRow,
-      };
+      },
     });
   };
 
@@ -151,7 +156,7 @@ class App extends Component {
               onButtonSubmit={this.onButtonSubmit}
             />
             <FaceRecognition
-              boxes={this.state.boxes}
+              box={this.state.box}
               imageUrl={this.state.imageUrl}
             />
           </div>
