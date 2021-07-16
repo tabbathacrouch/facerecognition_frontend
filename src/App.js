@@ -8,7 +8,6 @@ import SignIn from "./components/SignIn/SignIn";
 import Register from "./components/Register/Register";
 import "./App.css";
 
-
 const particleOptions = {
   particles: {
     number: {
@@ -29,14 +28,8 @@ const particleOptions = {
 // https://www.biography.com/.image/c_fill%2Ccs_srgb%2Cfl_progressive%2Ch_400%2Cq_auto:good%2Cw_620/MTY2Njc5MTIyNzY2OTk2NTM1/nikola_tesla_napoleon-sarony-public-domain-via-wikimedia-commons.jpg
 
 const initialState = {
-  imageUrl:
-    "",
-  box: {
-    top_row: 0,
-    left_col: 0,
-    bottom_row: 0,
-    right_col: 0,
-  },
+  imageUrl: "",
+  boxes: [],
   route: "signin",
   isSignedIn: false,
   user: {
@@ -59,14 +52,15 @@ class App extends Component {
   };
 
   onButtonSubmit = () => {
-        fetch("https://secret-hamlet-67600.herokuapp.com/imageUrl", {
-          method: "post",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            imageUrl: this.state.imageUrl,
-          })
-        }).catch(err => console.log(err))
-        .then(response => response.json())
+    fetch("https://secret-hamlet-67600.herokuapp.com/imageUrl", {
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        imageUrl: this.state.imageUrl,
+      }),
+    })
+      .catch((err) => console.log(err))
+      .then((response) => response.json())
       .then((response) => {
         if (response) {
           fetch("https://secret-hamlet-67600.herokuapp.com/image", {
@@ -87,7 +81,8 @@ class App extends Component {
                   },
                 };
               });
-            }).catch(console.log)
+            })
+            .catch(console.log);
         } else {
           console.log("unable to fetch number of submissions");
         }
@@ -96,23 +91,23 @@ class App extends Component {
       .catch((err) => console.log(err));
   };
 
-  calculateFaceLocation = (response) => {
-    const clarifaiFace =
-      response.outputs[0].data.regions[0].region_info.bounding_box;
-    const image = document.getElementById("inputimage");
-    const width = Number(image.width);
-    const height = Number(image.height);
-    const topRow = clarifaiFace.top_row * height;
-    const leftCol = clarifaiFace.left_col * width;
-    const rightCol = width - clarifaiFace.right_col * width;
-    const bottomRow = height - clarifaiFace.bottom_row * height;
-    this.setState({
-      box: {
+  calculateFaceLocations = (response) => {
+    return response.outputs[0].data.regions.map((face) => {
+      0;
+      const clarifaiFace = face.region_info.bounding_box;
+      const image = document.getElementById("inputimage");
+      const width = Number(image.width);
+      const height = Number(image.height);
+      const topRow = clarifaiFace.top_row * height;
+      const leftCol = clarifaiFace.left_col * width;
+      const rightCol = width - clarifaiFace.right_col * width;
+      const bottomRow = height - clarifaiFace.bottom_row * height;
+      return {
         left: leftCol,
         top: topRow,
         right: rightCol,
         bottom: bottomRow,
-      },
+      };
     });
   };
 
@@ -156,7 +151,7 @@ class App extends Component {
               onButtonSubmit={this.onButtonSubmit}
             />
             <FaceRecognition
-              box={this.state.box}
+              boxes={this.state.boxes}
               imageUrl={this.state.imageUrl}
             />
           </div>
