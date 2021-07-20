@@ -20,21 +20,9 @@ const particleOptions = {
   },
 };
 
-// images that are entered must be a url, below are some examples:
-// https://upload.wikimedia.org/wikipedia/commons/7/7e/Rachel_McAdams_by_Gage_Skidmore.jpg
-// https://upload.wikimedia.org/wikipedia/commons/9/98/Tom_Hanks_face.jpg
-// https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSOdSLG9Mz6y4TbG4iC_LUKfoIdbqnNtFosSw&usqp=CAU
-// https://upload.wikimedia.org/wikipedia/commons/4/4d/Kamala_Harris_%2848571501617%29.jpg
-// https://www.biography.com/.image/c_fill%2Ccs_srgb%2Cfl_progressive%2Ch_400%2Cq_auto:good%2Cw_620/MTY2Njc5MTIyNzY2OTk2NTM1/nikola_tesla_napoleon-sarony-public-domain-via-wikimedia-commons.jpg
-
 const initialState = {
   imageUrl: "",
-  box: {
-    top_row: 0,
-    left_col: 0,
-    bottom_row: 0,
-    right_col: 0,
-  },
+  boxes: [],
   route: "signin",
   isSignedIn: false,
   user: {
@@ -91,29 +79,28 @@ class App extends Component {
         } else {
           console.log("unable to fetch number of submissions");
         }
-        this.calculateFaceLocation(response);
+        this.displayFaceBoxes(this.calculateFaceLocations(response));
       })
       .catch((err) => console.log(err));
   };
 
-  calculateFaceLocation = (response) => {
-    const clarifaiFace =
-      response.outputs[0].data.regions[0].region_info.bounding_box;
-    const image = document.getElementById("inputimage");
-    const width = Number(image.width);
-    const height = Number(image.height);
-    const topRow = clarifaiFace.top_row * height;
-    const leftCol = clarifaiFace.left_col * width;
-    const rightCol = width - clarifaiFace.right_col * width;
-    const bottomRow = height - clarifaiFace.bottom_row * height;
-    this.setState({
-      box: {
-        left: leftCol,
-        top: topRow,
-        right: rightCol,
-        bottom: bottomRow,
-      },
+  calculateFaceLocations = (response) => {
+    return response.outputs[0].data.regions.map((face) => {
+      const clarifaiFace = face.region_info.bounding_box;
+      const image = document.getElementById("inputimage");
+      const width = Number(image.width);
+      const height = Number(image.height);
+      return {
+        bottom_row: height - clarifaiFace.bottom_row * height,
+        left_col: clarifaiFace.left_col * width,
+        right_col: width - clarifaiFace.right_col * width,
+        top_row: clarifaiFace.top_row * height,
+      };
     });
+  };
+
+  displayFaceBoxes = (boxes) => {
+    this.setState({ boxes: boxes });
   };
 
   onRouteChange = (route) => {
@@ -156,7 +143,7 @@ class App extends Component {
               onButtonSubmit={this.onButtonSubmit}
             />
             <FaceRecognition
-              box={this.state.box}
+              boxes={this.state.boxes}
               imageUrl={this.state.imageUrl}
             />
           </div>
