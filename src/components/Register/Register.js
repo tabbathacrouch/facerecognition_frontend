@@ -26,6 +26,7 @@ class Register extends React.Component {
     event.preventDefault();
     fetch("https://secret-hamlet-67600.herokuapp.com/register", {
       method: "post",
+      headers: { "Content-Type": "application/json" },
       mode: "no-cors",
       body: JSON.stringify({
         email: this.state.email,
