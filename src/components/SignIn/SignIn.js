@@ -36,7 +36,8 @@ class SignIn extends React.Component {
           );
           this.props.onRouteChange("register");
         }
-      });
+      })
+      .catch(console.log);
   };
 
   render() {
