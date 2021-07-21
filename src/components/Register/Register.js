@@ -32,6 +32,7 @@ class Register extends React.Component {
         password: this.state.password,
         name: this.state.name,
       }),
+      credentials: "include",
     })
       .then((response) => response.json())
       .then((user) => {
@@ -39,7 +40,8 @@ class Register extends React.Component {
           this.props.loadUser(user);
           this.props.onRouteChange("home");
         }
-      }).catch(console.log)
+      })
+      .catch(console.log);
   };
 
   render() {
